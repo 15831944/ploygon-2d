@@ -11,7 +11,7 @@ public:
 	bool contains(CExentedPolygon*polygon);
 	bool remove(CExentedPolygon* polygon);
 	void put(CExentedPolygon* polygon);
-	bool safePut(CExentedPolygon* polygon);
+	bool canSafePut(CExentedPolygon* polygon);
 	vector<CExentedPolygon*>* getPolygonInsize(){return this->m_polygons_inside;};
 
 	double getBlankArea(){return this->m_blankArea;};
@@ -20,7 +20,7 @@ public:
 	int getListSize(){return m_listSize;};
 
 	double getCoverageRatio(){return 1 - this->getBlankArea()/this->getArea();};
-
+	AcDbEntity* getEntity(){return m_container->getEnty();};
 
 private:
 	int getQuadrant(CExentedPolygon* polygon);

@@ -11,7 +11,7 @@ public:
 
 public:
 	CExentedPolygon* builderPolygon(int edgeNum, int minRadius, int maxRadius);
-	CExentedPolygon* builderPolygon(CRectangleContainer* box,int edgeNum);
+	CExentedPolygon* builderPolygon(int edgeNum);
 
 private:
 	CExentedPolygon* randAnyPolygonWithinBox(CRectangleContainer* box,int edgeNum);

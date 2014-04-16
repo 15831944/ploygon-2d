@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "RectangleContainer.h"
 #include <algorithm>
+#include "cad_helper.h"
 
 
 // 比较方法
@@ -137,6 +138,11 @@ void CRectangleContainer::put(CExentedPolygon* polygon)
 	double area = 0.0;
 	polygon->getArea(area);
 	this->m_blankArea-=area;
+	if(this->m_blankArea < 0)
+	{
+		this->m_blankArea = 0;
+		return ;
+	}
 	m_listSize = 0;
 	for(int i = 0; i < 5; ++i)
 	{
@@ -144,9 +150,13 @@ void CRectangleContainer::put(CExentedPolygon* polygon)
 	}
 
 	int size = polygon->getVerts().length();
-	acutPrintf(_T("%d: %d-edges  %.2f%%-coverage  %.2f-area\n\r"),m_listSize,size,getCoverageRatio()*100,area);
+	acutPrintf(_T("%d: %d-edges  %.2f%%-coverage  %.2f-area\n\r"),m_listSize,size,getCoverageRatio()*100,this->m_blankArea);
+	// 添加到模型空间
+	Cad_Helper::PostToModelSpace(polygon->getEnty());
+
 }
-bool CRectangleContainer::safePut(CExentedPolygon* polygon)
+
+bool CRectangleContainer::canSafePut(CExentedPolygon* polygon)
 {
 	if(!this->contains(polygon))
 	{
@@ -191,9 +201,7 @@ bool CRectangleContainer::safePut(CExentedPolygon* polygon)
 				return false;
 			}
 		}
-	}
-
-	this->put(polygon);
-	return true;
-
+	} 
+	 
+	return true; 
 }

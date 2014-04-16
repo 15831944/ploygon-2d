@@ -26,7 +26,7 @@ CExentedPolygon* CExtendedPolygonBuilder::builderPolygon(int edgeNum, int minRad
 	return this->randAnyPolygonWithinBox(m_pContainer,edgeNum,minRadius,maxRadius);
 }
 
-CExentedPolygon* CExtendedPolygonBuilder::builderPolygon(CRectangleContainer* box,int edgeNum)
+CExentedPolygon* CExtendedPolygonBuilder::builderPolygon(int edgeNum)
 {
 	return this->randAnyPolygonWithinBox(m_pContainer,edgeNum);
 }
@@ -65,7 +65,55 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 
 		} while (true);
 		
-		if(i == 2)
+		if(generatedPoints.length() == 3)
+		{
+			double area = Cad_Helper::getArea(generatedPoints);
+			if(area < minTriangleArea)
+			{
+				i = 0;
+				generatedPoints.removeAll();
+			}
+		}
+
+	}
+	
+
+	AcGePoint3dArray clockWisePointArray = Cad_Helper::getClockWiseArray(center,generatedPoints);
+
+	CExentedPolygon* pResultPolygon = new CExentedPolygon(clockWisePointArray);
+	pResultPolygon->setCircleCenter(center); 
+    
+	return pResultPolygon;
+}
+
+CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleContainer* box,int edgeNum, int minRadius, int maxRadius)
+{
+	srand((unsigned)time(NULL));
+	AcGePoint3d center;
+	center.x = box->m_x + rand()%((int)(box->m_width-0.5));
+	center.y = box->m_y + rand()%((int)(box->m_height-0.5));
+	 
+	int radius = minRadius + rand()%(maxRadius-minRadius+1);
+
+	double minTriangleArea = 0.05*radius*radius*PI;
+
+	AcGePoint3dArray generatedPoints;
+	for(int i = 0;i < edgeNum; ++i)
+	{
+		do 
+		{
+			double param_t =  (double)rand() / RAND_MAX; 
+			param_t = param_t*2*PI;
+			AcGePoint3d p(radius*cos(param_t)+center.x,radius*sin(param_t)+center.y,0);
+			if(!generatedPoints.contains(p))
+			{
+				generatedPoints.append(p);
+				break;
+			}
+
+		} while (true);
+
+		if(generatedPoints.length() == 3)
 		{
 			double area = Cad_Helper::getArea(generatedPoints);
 			if(area < minTriangleArea)
@@ -77,18 +125,10 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 
 	}
 
-	 
-	
- 
-    
-	return new CExentedPolygon(generatedPoints);
+	AcGePoint3dArray clockWisePointArray = Cad_Helper::getClockWiseArray(center,generatedPoints);
 
-	
+	CExentedPolygon* pResultPolygon = new CExentedPolygon(clockWisePointArray);
+	pResultPolygon->setCircleCenter(center); 
 
-}
-
-CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleContainer* box,int edgeNum, int minRadius, int maxRadius)
-{
-	AcGePoint3dArray generatedPoints;
-	return new CExentedPolygon(generatedPoints);
+	return pResultPolygon;
 }

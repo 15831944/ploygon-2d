@@ -4,7 +4,7 @@
 class CollectionComparator
 {
 public:
-	CollectionComparator(const AcGePoint3d & center)
+	CollectionComparator(const AcGePoint3d  center)
 	:m_center(center)
 	{
 	}
@@ -56,56 +56,56 @@ public:
 		{
 			if(on_right_v1v2)
 			{
-				return -1;
+				return false;
 			} 
 			else
 			{
-				return 1;
+				return true;
 			}
 		} 
 		else if(on_left_av1 && on_left_av2)
 		{
 			if(on_right_v1v2)
 			{
-				return -1;
+				return false;
 			} 
 			else 
 			{
-				return 1;
+				return true;
 			}
 		} 
 		else if(on_right_av1 && on_left_av2)
 		{
-			return -1;
+			return false;
 		} 
 		else if(on_left_av1 && on_right_av2)
 		{
-			return 1;
+			return true;
 		} 
 		else if(on_same_v1v2)
 		{
 			// on_same_av1 && on_same_av2
 			if(dotpro_av1 == magpro_av1)
 			{
-				return -1;
+				return false;
 			} 
 			else
 			{
-				return 1;
+				return true;
 			}
 		} 
 		else if(on_same_av1 && on_left_av2)
 		{
-			return -1;
+			return false;
 		}
 		else if(on_same_av1 && on_right_av2)
 		{
 			if(dotpro_av1 == magpro_av1)
 			{
-				return -1;
+				return false;
 			} else 
 			{
-				return 1;
+				return true;
 			}
 		} 
 		else if(on_same_av2 && on_left_av1) 
@@ -117,11 +117,11 @@ public:
 			//                } else if(on_same_av2 && on_right_av1) {
 			if(dotpro_av2 == magpro_av2)
 			{
-				return 1;
+				return true;
 			}
 			else
 			{
-				return -1;
+				return false;
 			}
 		} 
 		return true;
@@ -163,7 +163,7 @@ private:
 
 
 private:
-	AcGePoint3d & m_center;
+	AcGePoint3d m_center;
 };
 
 

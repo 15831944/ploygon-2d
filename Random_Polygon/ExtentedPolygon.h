@@ -18,10 +18,10 @@ public:
 	// ÊÇ·ñÏà½»
     bool intersects(CExentedPolygon* polygon);
 	
-	AcGePoint3d getCircleRadius(){return m_circleCenter;};
-	void   setCircleRadius(AcGePoint3d center){this->m_circleCenter = center;};
+	AcGePoint3d getCircleCenter(){return m_circleCenter;};
+	void   setCircleCenter(AcGePoint3d center){this->m_circleCenter = center;};
 
-	double getCenter(){return m_radius;};
+	double getRadius(){return m_radius;};
 	void   setRadius(double radius){this->m_radius = radius;};
 
 	int getQuadrant(){return m_quadrant;};

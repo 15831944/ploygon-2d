@@ -1,3 +1,11 @@
+#ifndef CAD_HELPER_H
+#define CAD_HELPER_H
+
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+#include "vectorcomparator.h"
 
 class Cad_Helper
 {
@@ -31,12 +39,42 @@ public:
 		double area = 0.0;
 		for(int i = 0; i < points.length() -1; ++i)
 		{
-			area = area+ Cad_Helper::getArea(points.at(0),points.at(i),points.at(i+1));
-			acutPrintf(_T("area1 = %f"),area);
+			area = area+ Cad_Helper::getArea(points.at(0),points.at(i),points.at(i+1)); 
 		} 
 
 		area = abs(area)/2;
+		acutPrintf(_T("area = %f\n\r"),area);
 		return area;
 	}
 
+	static AcGePoint3dArray getClockWiseArray(AcGePoint3d center,AcGePoint3dArray points)
+	{  
+
+		AcGePoint3dArray resultArray;
+		vector<AcGePoint3d> tmpPoints;
+
+		for(int i = 0; i < points.length(); ++i)
+		{
+			tmpPoints.push_back(points.at(i));
+		} 
+
+		std::sort(tmpPoints.begin(),tmpPoints.end(),CollectionComparator(center));
+
+
+
+		for(int i = 0; i < tmpPoints.size(); ++i)
+		{
+			AcGePoint3d p = tmpPoints[i];
+			//acutPrintf(_T("(%.2f,%.2f,%.3f)\n\r"),p.x,p.y,p.z);
+			resultArray.append(p);
+
+		}
+
+		return resultArray;
+
+
+	}
+
 };
+
+#endif

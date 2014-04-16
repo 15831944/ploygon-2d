@@ -45,9 +45,6 @@ void CExentedPolygon::getArea(double& area)
 
 	area = Cad_Helper::getArea(this->m_points);
 
-	
-	area = abs(area)/2;
-	acutPrintf(_T("area1 = %f\n\r"),area);
 	m_area = area;
 }
 AcGePoint3dArray CExentedPolygon::getVerts()
