@@ -42,6 +42,8 @@ CRectangleContainer::CRectangleContainer(int x,int y,int width, int height)
 
 CRectangleContainer::~CRectangleContainer(void)
 {
+	delete m_container;
+	m_container = NULL;
 }
 
 vector<CExentedPolygon*> CRectangleContainer::getAllPolygons()
@@ -72,24 +74,30 @@ int CRectangleContainer::calculateQuadrant(CExentedPolygon* polygon, int x, int 
 	CRectangleContainer* section3 = new CRectangleContainer(x,center.y,width/2,height/2);
 	CRectangleContainer* section4 = new CRectangleContainer(center.x,center.y,width/2,height/2);
 
+	int result = 0;
 	if(section1->contains(polygon)) 
 	{
-		return 1;
+		result = 1;
 	} 
 	else if(section2->contains(polygon)) 
 	{
-		return 2;
+		result = 2;
 	} 
 	else if(section3->contains(polygon)) 
 	{
-		return 3;
+		result = 3;
 	} 
 	else if(section4->contains(polygon)) 
 	{
-		return 4;
+		result = 4;
 	} 
+
+	delete section1;section1 = NULL;
+	delete section2;section2 = NULL;
+	delete section3;section3 = NULL;
+	delete section4;section4 = NULL;
  
-	return 0;
+	return result;
 
 }
 bool CRectangleContainer::contains(CExentedPolygon*polygon)

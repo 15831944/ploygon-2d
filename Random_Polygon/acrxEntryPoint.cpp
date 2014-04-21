@@ -122,16 +122,17 @@ public:
 		//Cad_Helper::PostToModelSpace(pEntiy);
 		//
 
-		int maxEdge = 5;
-		int minRadius = 20;
-		int maxRadius = 50;
-		double minCoverageRadio = 0.45;
+		int maxEdge = 4;
+		int minRadius = 60;
+		int maxRadius = 150;
+		double minCoverageRadio = 0.20;
 		int width = 500;
 		int height = 500;
-		int loopCount = 250000; 
+		int loopCount = 50000; 
 		int stepX = -1;
 		int stepY = 1;
-		int expandStep = 1;
+		int expandStep = 3;
+		int totalLoop = 10000;
 		 
 
 		long start = 0, finish = 0;
@@ -140,95 +141,73 @@ public:
 		CRectangleContainer* container = new CRectangleContainer(0,0,width,height);
 		Cad_Helper::PostToModelSpace(container->getEntity());
 
+		int iTotalCount = 0;
 		while(true)
 		{
-			 bool result = false;
-			 CExentedPolygon* polygon = CRandonPolygonGen::randWithinBox(container,maxEdge,minRadius,maxRadius);
-			 result = container->canSafePut(polygon);
-			 if(result)
-			 {
-				container->put(polygon);
-			 }
-			 else// 失败投放后，进行20次更正投放
-			 {
-				 
-				for(int i = 0; i < 20; ++i)
-				{
-					srand((unsigned)time(NULL));
-					int deltX = stepX + (rand()%3);
-					int deltY = stepY;
-					polygon->treanslate(deltX,deltY);
-					result = container->canSafePut(polygon);
-					if(result)
-					{
-						container->put(polygon);
-						break;
-					} 
-				}
-			 }  
-
-
-			 // 填充
-			 {
-
-				 srand((unsigned)time(NULL));
-				 for (int i = 0; i < loopCount; ++i)
+			iTotalCount++;
+			if(iTotalCount > totalLoop)
+			{
+				break;
+			}
+			try
+			{ 
+				 bool result = false;
+				 CExentedPolygon* polygon = CRandonPolygonGen::randWithinBox(container,maxEdge,minRadius,maxRadius);
+				 if(polygon == NULL)
 				 {
-					int x = rand()/(container->m_width-1)+1;
-					int y = rand()/(container->m_height-1)+1;
-					int iWidth = minRadius/2;
-					int iHeight = container->m_width;
-
-					 
-
-					CExentedPolygon* pPolygon = NULL;
-					bool bOK = false;
-					for(int j = 0; j < maxRadius*2; j+=expandStep)
-					{
-						iWidth+=j;
-						iHeight+=j;
-
-						CExentedPolygon* temPoly = CRandonPolygonGen::randWithinBox(new CRectangleContainer(x,y,iWidth,iHeight),5);
-						bOK = container->canSafePut(temPoly);
-						if(bOK)
-						{
-							pPolygon = temPoly; 
-						}
-						else
-						{
-							break;
-						}
-					}
-
-					if(pPolygon!=NULL)
-					{
-						container->put(pPolygon);
-					}
-
-					if(container->getCoverageRatio() > minCoverageRadio)
-					{
-						break;
-					}
-
-
+					 continue;
 				 }
+				 result = container->canSafePut(polygon);
+				 if(result)
+				 {
+					 acutPrintf(_T("_1_"));
+					container->put(polygon);
+				 }
+				 else// 失败投放后，进行20次更正投放
+				 {
+					 
+					for(int i = 0; i < 20; ++i)
+					{
+						srand((unsigned)time(NULL));
+						int deltX = stepX + (rand()%3);
+						int deltY = stepY;
 
-			 }
+						polygon->treanslate(deltX,deltY);
+						result = container->canSafePut(polygon);
+						if(result)
+						{
+							acutPrintf(_T("_2_"));
+							container->put(polygon);
+							break;
+						} 
+					}//end for
+				 } //end else  
+			 
+				// fill aswsome position
+				if(CRandonPolygonGen::Fill(container,loopCount,minRadius,maxRadius,expandStep,maxEdge,minCoverageRadio))
+				{
+
+					break;
+				}
+
+			}//end try
+			catch(...)
+			{
+				acutPrintf(_T("an error ocurre"));
+			}
+
+
 
 			 if(container->getCoverageRatio() > minCoverageRadio)
 			 {
 				 break;
 			 }
 			 
-		}
+		}//end while
 
 		finish = clock();
 		duration = (finish - start)/1000;
-		acutPrintf( _T("Total cost: %f seconds\n"), duration );
-
-
-
-
+		acutPrintf( _T("Total cost: %f seconds\n"), duration ); 
 		
 	}
 } ;

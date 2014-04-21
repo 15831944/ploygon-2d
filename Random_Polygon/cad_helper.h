@@ -42,8 +42,7 @@ public:
 			area = area+ Cad_Helper::getArea(points.at(0),points.at(i),points.at(i+1)); 
 		} 
 
-		area = abs(area)/2;
-		acutPrintf(_T("area = %f\n\r"),area);
+		area = abs(area)/2;  
 		return area;
 	}
 

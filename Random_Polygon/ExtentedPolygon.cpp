@@ -3,6 +3,8 @@
 #include "guid_helper.h"
 #include "cad_helper.h"
 
+
+
 CExentedPolygon::CExentedPolygon(const AcGePoint3dArray& points)
 :m_points(points)
 ,m_quadrant(-1)
@@ -11,7 +13,7 @@ CExentedPolygon::CExentedPolygon(const AcGePoint3dArray& points)
 ,m_circleCenter(AcGePoint3d())
 ,m_entity(NULL)
 { 
-	m_entity = new AcDb2dPolyline(AcDb::k2dSimplePoly,m_points,0,Adesk::kTrue);
+	//m_entity = new AcDb2dPolyline(AcDb::k2dSimplePoly,m_points,0,Adesk::kTrue);
 	m_key = guid::createGuid();
 }
 bool CExentedPolygon::equal(CExentedPolygon* polygon)
@@ -25,6 +27,8 @@ bool CExentedPolygon::equal(CExentedPolygon* polygon)
 
 CExentedPolygon::~CExentedPolygon(void)
 {
+	 
+	
 }
 AcDb2dPolyline* CExentedPolygon::getEnty()
 {
@@ -76,7 +80,7 @@ bool CExentedPolygon::intersects(CExentedPolygon* polygon)
 {
 
 
-	{
+	/*{
 		AcGePoint3dArray points;
 		if(Acad::eOk == polygon->getEnty()->boundingBoxIntersectWith(this->getEnty(),AcDb::kOnBothOperands,points,0,0))
 		{
@@ -85,7 +89,7 @@ bool CExentedPolygon::intersects(CExentedPolygon* polygon)
 				return false;
 			}
 		}
-	}
+	}*/
 
 	 
 	int size = m_points.length();
@@ -103,7 +107,7 @@ bool CExentedPolygon::intersects(CExentedPolygon* polygon)
 	}
 
  
-	AcGePoint3dArray points = polygon->getVerts();
+	AcGePoint3dArray& points = polygon->getVerts();
 	size = points.length();
 	// Check each of other polygon's norms
 	for (int i = 0; i < size; i++) 
@@ -134,13 +138,13 @@ AcGePoint3dArray CExentedPolygon::getNorms()
 	int i= 0;
 	for( ; i < size -1; ++i)
 	{
-		AcGePoint3d pt1 =m_points.at(i);
-		AcGePoint3d pt2 =m_points.at(i+1);
+		AcGePoint3d& pt1 =m_points.at(i);
+		AcGePoint3d& pt2 =m_points.at(i+1);
 		AcGePoint3d normPt(pt1.y - pt2.y,pt2.x-pt1.x,0);
 		m_norms.append(normPt);
 	}
-	AcGePoint3d pt2 =m_points.at(0);
-	AcGePoint3d pt1 =m_points.at(i);
+	AcGePoint3d &pt2 =m_points.at(0);
+	AcGePoint3d &pt1 =m_points.at(i);
 	m_norms.append(AcGePoint3d(pt1.y - pt2.y,pt2.x-pt1.x,0)); 
 
 	return m_norms;
@@ -149,9 +153,17 @@ AcGePoint3dArray CExentedPolygon::getNorms()
 
 void CExentedPolygon::treanslate(int deltX,int deltY)
 { 
-	AcGeMatrix3d matrix;
-	matrix.setTranslation(AcGeVector3d(deltX,deltY,0));
-	this->m_entity->transformBy(matrix);
+	AcGeMatrix3d matrix = AcGePoint3d(deltX,deltY,0) - AcGePoint3d(0,0,0); 
+	 
 	this->m_circleCenter.transformBy(matrix);
-
+	int size = m_points.length();
+	int i= 0;
+	for( ; i < size; ++i)
+	{
+		AcGePoint3d& pt = m_points.at(i); 
+		pt.transformBy(matrix);
+		 
+		
+	}
+ 
 }

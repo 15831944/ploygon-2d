@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-using namespace std;
+using namespace std; 
 
 
-class CExentedPolygon
+class CExentedPolygon 
 {
 public:
 	CExentedPolygon(const AcGePoint3dArray& points); 
@@ -43,4 +43,5 @@ private:
 	// ×ø±êµã
 	AcGePoint3dArray m_points; 
 	string m_key;
+
 };

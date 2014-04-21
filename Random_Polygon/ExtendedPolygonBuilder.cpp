@@ -49,9 +49,11 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 	double minTriangleArea = 0.3*radius*radius*PI;
 
 	AcGePoint3dArray generatedPoints;
+	int totalCount = 0;
 	//CExentedPolygon* polygon = new CExentedPolygon()
 	for(int i = 0;i < edgeNum; ++i)
 	{
+		int pCount = 10000;
 		do 
 		{
 			double param_t =  (double)rand() / RAND_MAX; 
@@ -60,6 +62,11 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 			if(!generatedPoints.contains(p))
 			{
 				generatedPoints.append(p);
+				break;
+			}
+
+			if(pCount-- < 0)
+			{
 				break;
 			}
 
@@ -72,18 +79,28 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 			{
 				i = 0;
 				generatedPoints.removeAll();
+				totalCount++;
+				if(totalCount > 1000)
+				{
+
+					return NULL;
+				}
 			}
 		}
 
 	}
-	
+	// 如果有三个点
+	if(generatedPoints.length() > 2)
+	{
+		AcGePoint3dArray clockWisePointArray = Cad_Helper::getClockWiseArray(center,generatedPoints);
 
-	AcGePoint3dArray clockWisePointArray = Cad_Helper::getClockWiseArray(center,generatedPoints);
+		CExentedPolygon* pResultPolygon = new CExentedPolygon(clockWisePointArray);
+		pResultPolygon->setCircleCenter(center);  
+		return pResultPolygon;
+	}
 
-	CExentedPolygon* pResultPolygon = new CExentedPolygon(clockWisePointArray);
-	pResultPolygon->setCircleCenter(center); 
-    
-	return pResultPolygon;
+
+	return NULL;
 }
 
 CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleContainer* box,int edgeNum, int minRadius, int maxRadius)
@@ -96,20 +113,26 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 	int radius = minRadius + rand()%(maxRadius-minRadius+1);
 
 	double minTriangleArea = 0.05*radius*radius*PI;
-
+	int totalCount = 0;
 	AcGePoint3dArray generatedPoints;
 	for(int i = 0;i < edgeNum; ++i)
 	{
+		int pCount = 10000;
 		do 
 		{
-			double param_t =  (double)rand() / RAND_MAX; 
-			param_t = param_t*2*PI;
+			double param_t =  (double)rand() / RAND_MAX;  
+			param_t = param_t*2*PI; // 0-360角度
 			AcGePoint3d p(radius*cos(param_t)+center.x,radius*sin(param_t)+center.y,0);
 			if(!generatedPoints.contains(p))
 			{
 				generatedPoints.append(p);
 				break;
 			}
+			if(pCount-- < 0)
+			{
+				break;
+			}
+
 
 		} while (true);
 
@@ -120,15 +143,27 @@ CExentedPolygon* CExtendedPolygonBuilder::randAnyPolygonWithinBox(CRectangleCont
 			{
 				i = 0;
 				generatedPoints.removeAll();
+				totalCount++;
+				if(totalCount > 1000)
+				{
+
+					return NULL;
+				}
 			}
 		}
 
 	}
 
-	AcGePoint3dArray clockWisePointArray = Cad_Helper::getClockWiseArray(center,generatedPoints);
+	// 如果有三个点
+	if(generatedPoints.length()>2)
+	{
+		AcGePoint3dArray clockWisePointArray = Cad_Helper::getClockWiseArray(center,generatedPoints);
 
-	CExentedPolygon* pResultPolygon = new CExentedPolygon(clockWisePointArray);
-	pResultPolygon->setCircleCenter(center); 
+		CExentedPolygon* pResultPolygon = new CExentedPolygon(clockWisePointArray);
+		pResultPolygon->setCircleCenter(center); 
+		return pResultPolygon;
+	}
 
-	return pResultPolygon;
+	return NULL;
+
 }
