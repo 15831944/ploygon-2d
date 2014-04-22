@@ -84,11 +84,12 @@ void CExentedPolygon::GetMinMaxProjs(AcGePoint3d arix,int & minProj, int & maxPr
 bool  CExentedPolygon::OutBoxIntersects(CExentedPolygon* polygon)
 {
 	// 半径之间和
-	double radiusDistance =  polygon->getRadius() + this->m_radius ;
-	int centerDistance =  abs(pow(this->m_circleCenter.x - polygon->getCircleCenter().x,2.0)+pow(this->m_circleCenter.y - polygon->getCircleCenter().y,2.0));
-
-	return centerDistance <= radiusDistance;
-
+	double radiusDistance =  polygon->getRadius() + this->m_radius;
+	 
+	// 圆点之间的距离
+	int centerDistance =  sqrt(pow(this->m_circleCenter.x - polygon->getCircleCenter().x,2.0)+pow(this->m_circleCenter.y - polygon->getCircleCenter().y,2.0));
+ 
+	return centerDistance < radiusDistance; 
 }
 
 
