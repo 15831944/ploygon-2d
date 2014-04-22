@@ -125,13 +125,13 @@ public:
 		int maxEdge = 4;
 		int minRadius = 60;
 		int maxRadius = 150;
-		double minCoverageRadio = 0.20;
+		double minCoverageRadio = 0.10;
 		int width = 500;
 		int height = 500;
-		int loopCount = 50000; 
+		int loopCount = width*height; 
 		int stepX = -1;
 		int stepY = 1;
-		int expandStep = 3;
+		int expandStep = 1 ;
 		int totalLoop = 10000;
 		 
 
@@ -186,7 +186,6 @@ public:
 				// fill aswsome position
 				if(CRandonPolygonGen::Fill(container,loopCount,minRadius,maxRadius,expandStep,maxEdge,minCoverageRadio))
 				{
-
 					break;
 				}
 

@@ -1,11 +1,14 @@
 #include "StdAfx.h"
 #include "RectangleContainer.h"
+#include "ExtentedPolygon.h"
 #include <algorithm>
+#include <functional>
 #include "cad_helper.h"
+#include "Windows.h" 
 
 
 // 比较方法
-struct CPolygonCompar:binary_function<CExentedPolygon*,CExentedPolygon*,bool>
+struct CPolygonCompar:public binary_function<CExentedPolygon*,CExentedPolygon*,bool>
 {
 	bool operator()(CExentedPolygon*p1,CExentedPolygon*p2)const
 	{
@@ -18,6 +21,7 @@ struct CPolygonCompar:binary_function<CExentedPolygon*,CExentedPolygon*,bool>
 };
 
 
+
 CRectangleContainer::CRectangleContainer(int x,int y,int width, int height)
 :m_container(NULL)
 ,m_blankArea(width*height)
@@ -28,11 +32,12 @@ CRectangleContainer::CRectangleContainer(int x,int y,int width, int height)
 ,m_width(width)
 ,m_height(height)
 {
-	AcGePoint3dArray points;
-	points.append(AcGePoint3d(x,y,0));
-	points.append(AcGePoint3d(x,y+height,0));
-	points.append(AcGePoint3d(x+width,y+height,0));
-	points.append(AcGePoint3d(x+width,y,0));
+	vector<POINT> points;
+	POINT p1 = {x,y},p2 = {x,y+height},p3 = {x+width,y+height},p4 = {x+width,y};
+	points.push_back(p1);
+	points.push_back(p2);
+	points.push_back(p3);
+	points.push_back(p4);
 	m_container = new CExentedPolygon(points);
 	for(int i = 0; i < 5;++i)
 	{
@@ -65,7 +70,7 @@ int CRectangleContainer::getQuadrant(CExentedPolygon* polygon)
 int CRectangleContainer::calculateQuadrant(CExentedPolygon* polygon, int x, int y, int width, int height)
 {
 
-	AcGePoint3d center;
+	POINT center;
 	center.x = x+width/2;
 	center.y = y+height/2;
 
@@ -102,11 +107,11 @@ int CRectangleContainer::calculateQuadrant(CExentedPolygon* polygon, int x, int 
 }
 bool CRectangleContainer::contains(CExentedPolygon*polygon)
 {
-	AcGePoint3dArray points = polygon->getVerts();
-	int size = points.length();
+	vector<POINT>& POINTs = polygon->getVerts();
+	int size = POINTs.size();
 	for(int i = 0; i < size; ++i)
 	{
-		if(!contains(points.at(i).x,points.at(i).y))
+		if(!contains(POINTs.at(i).x,POINTs.at(i).y))
 		{
 			return false;
 		}
@@ -157,25 +162,32 @@ void CRectangleContainer::put(CExentedPolygon* polygon)
 		m_listSize+=(this->m_polygons_inside[i]).size();
 	}
 
-	AcGePoint3dArray arrayList = polygon->getVerts();
-	int size = (int)arrayList.length(); 
+	
+	vector<POINT>& arrayList = polygon->getVerts();
+	int size = (int)arrayList.size();
 
-	acutPrintf(_T("\n\r<Polygon>\n\r"));	
-	wchar_t buffer[128] = {0};
+	
+	  
+	OutputDebugStringA("<Polygon>\n\r");	
+	char buffer[128] = {0};
 	for(int i = 0 ;i < size; ++i)
 	{
 		memset(buffer,0x0,128); 
-		AcGePoint3d pt = arrayList.at(i);
-		 
-		swprintf(buffer, _T("<Point><X>%.f</X><Y>%.f</Y></Point>\n\r"),pt.x,pt.y); 
+		POINT pt = arrayList[i];
+		long x = pt.x;
+		long y = pt.y;
+		sprintf(buffer, "<Point><X>%d</X><Y>%d</Y></Point>\n\r",x,y); 
 
-		acutPrintf(buffer);		
+		OutputDebugStringA(buffer);		
 	}
-	acutPrintf(_T("</Polygon>\n\r"));
+	OutputDebugStringA("</Polygon>\n\r");
+	
 
-	acutPrintf(_T("%d: %d-edges  %.2f%%-coverage  %.2f-area\n\r"),m_listSize,size,getCoverageRatio()*100,this->m_blankArea);
+	//
+	//acutPrintf(_T("%d: %d-edges  %.2f%%-coverage  %.2f-area\n\r"),m_listSize,size,getCoverageRatio()*100,this->m_blankArea);
+	//printfw(_T("%d: %d-edges  %.2f%%-coverage  %.2f-area\n\r"),m_listSize,size,getCoverageRatio()*100,this->m_blankArea);
 	// 添加到模型空间
-	Cad_Helper::PostToModelSpace(polygon->getEnty());
+	//Cad_Helper::PostToModelSpace(polygon->getEnty());
 
 }
 
@@ -190,8 +202,8 @@ bool CRectangleContainer::canSafePut(CExentedPolygon* polygon)
 	polygon->setQuadrant(section);
 
 	{	
-		vector<CExentedPolygon*>& polyList = this->m_polygons_inside[0];
-		for(int i = 0;i < polyList.size();++i)
+		vector<CExentedPolygon*>&  polyList = this->m_polygons_inside[0];
+		for(int i = 0;i < (int)polyList.size();++i)
 		{
 			if(polygon->intersects(polyList[i]))
 			{

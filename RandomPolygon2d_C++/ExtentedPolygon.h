@@ -1,27 +1,30 @@
 #pragma once
 #include <string>
+#include <vector>
 using namespace std; 
-
+#include <WinDef.h>
+#include <Windows.h>
 
 class CExentedPolygon 
 {
 public:
-	CExentedPolygon(const AcGePoint3dArray& points); 
+	CExentedPolygon(const vector<POINT>& points); 
 	virtual ~CExentedPolygon(void);
-	AcDb2dPolyline* getEnty();
+	/*AcDb2dPolyline* getEnty();*/
 	void getArea(double& area);
-    AcGePoint3dArray getNorms();
+    vector<POINT> getNorms();
 	// 获得顶点坐标集合
-	AcGePoint3dArray getVerts();
+	vector<POINT> getVerts();
 	// 获得投影
-	void GetMinMaxProjs(AcGePoint3d arix,int & minProj, int & maxProj);
+	void GetMinMaxProjs(POINT arix,int & minProj, int & maxProj);
 	// 是否相交
     bool intersects(CExentedPolygon* polygon);
+	
 	// 外接圆是否相交
 	bool OutBoxIntersects(CExentedPolygon* polygon);
 
-	AcGePoint3d getCircleCenter(){return m_circleCenter;};
-	void   setCircleCenter(AcGePoint3d center){this->m_circleCenter = center;};
+	POINT getCircleCenter(){return m_circleCenter;};
+	void   setCircleCenter(POINT center){this->m_circleCenter = center;};
 
 	double getRadius(){return m_radius;};
 	void   setRadius(double radius){this->m_radius = radius;};
@@ -35,15 +38,15 @@ public:
  
 	
 private:
-	AcDb2dPolyline* m_entity;
+	//AcDb2dPolyline* m_entity;
 	int m_quadrant;
 	double m_area;
 	double m_radius;// radius of the polygons' circum circle if it exists
-	AcGePoint3d m_circleCenter;
+	POINT m_circleCenter;
 	// 法向量
-	AcGePoint3dArray m_norms;
+	vector<POINT> m_norms;
 	// 坐标点
-	AcGePoint3dArray m_points; 
+	vector<POINT> m_points; 
 	string m_key;
 
 };
